@@ -1,15 +1,24 @@
 import { Message } from '@my-org/api-interfaces';
-import { Controller, Get, HttpService, Param, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpService,
+  Param,
+  Req,
+  HttpException
+} from '@nestjs/common';
 import { AxiosResponse } from 'axios';
 import { fork, ChildProcess } from 'child_process';
-import { Observable, Observer } from 'rxjs';
-import { map, mergeMap, tap } from 'rxjs/operators';
+import { Observable, Observer, throwError } from 'rxjs';
+import { map, mergeMap, tap, catchError } from 'rxjs/operators';
 
 interface Service {
   name: string;
   instance: ChildProcess;
   port?: number;
 }
+
+const AVAILABLE_SERVICES = ['service-a', 'service-b'];
 @Controller()
 export class AppController {
   services: { [serviceName: string]: Service } = {};
@@ -21,6 +30,10 @@ export class AppController {
     @Req() req: Request,
     @Param() { serviceName }: { serviceName: string }
   ): Observable<AxiosResponse<Message>> {
+    if (AVAILABLE_SERVICES.indexOf(serviceName) === -1) {
+      throw new HttpException('Service doesnt exist', 404);
+    }
+
     return this.getService(this.services, serviceName).pipe(
       tap((service: Service) => {
         if (!this.services[serviceName]) {
@@ -30,9 +43,14 @@ export class AppController {
       mergeMap((service: Service) => this.getServicePort(service)),
       tap((port: number) => (this.services[serviceName].port = port)),
       map((port: number) => this.getUrl('localhost', port, req.url)),
-      mergeMap((url: string) => {
-        return this.httpService.get(url).pipe(map(res => res.data));
-      })
+      mergeMap((url: string) =>
+        this.httpService.get(url).pipe(
+          map(res => res.data),
+          catchError(e =>
+            throwError(new HttpException(e.response.data, e.response.status))
+          )
+        )
+      )
     );
   }
 
