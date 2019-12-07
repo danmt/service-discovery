@@ -16,7 +16,9 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@my-org/api-interfaces": ["libs/api-interfaces/src/index.ts"]
+      "@my-org/api-interfaces": ["libs/api-interfaces/src/index.ts"],
+      "@my-org/heart-beat": ["libs/heart-beat/src/index.ts"],
+      "@my-org/service-manager": ["libs/service-manager/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

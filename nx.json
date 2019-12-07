@@ -25,6 +25,12 @@
     },
     "service-b": {
       "tags": []
+    },
+    "heart-beat": {
+      "tags": []
+    },
+    "service-manager": {
+      "tags": []
     }
   }
 }

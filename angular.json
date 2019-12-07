@@ -311,6 +311,56 @@
           }
         }
       }
+    },
+    "heart-beat": {
+      "root": "libs/heart-beat",
+      "sourceRoot": "libs/heart-beat/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/heart-beat/tsconfig.lib.json",
+              "libs/heart-beat/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!libs/heart-beat/**"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/heart-beat/jest.config.js",
+            "tsConfig": "libs/heart-beat/tsconfig.spec.json"
+          }
+        }
+      }
+    },
+    "service-manager": {
+      "root": "libs/service-manager",
+      "sourceRoot": "libs/service-manager/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/service-manager/tsconfig.lib.json",
+              "libs/service-manager/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!libs/service-manager/**"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/service-manager/jest.config.js",
+            "tsConfig": "libs/service-manager/tsconfig.spec.json"
+          }
+        }
+      }
     }
   },
   "cli": {

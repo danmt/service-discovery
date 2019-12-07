@@ -1,18 +1,14 @@
+import { HeartBeat } from '@my-org/heart-beat';
 import { NestFactory } from '@nestjs/core';
-
 import { AppModule } from './app/app.module';
 
 const SERVICE_NAME = 'Service B';
-const MAX_IDLE_TIME_IN_SECONDS = 10;
-const BEAT_STEP_IN_SECONDS = 1;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  let lastCallTs = Date.now();
   app.use((req, res, next) => {
-    console.log(`New request arrived...`);
-    lastCallTs = Date.now();
+    heartBeat.requestArrived();
     next();
   });
 
@@ -22,19 +18,8 @@ async function bootstrap() {
     `${SERVICE_NAME} running on http://localhost:${server.address().port}`
   );
 
-  setInterval(() => {
-    console.log(`${SERVICE_NAME} Beating...`);
-    console.log(
-      'Time passed since last request: ',
-      (Date.now() - lastCallTs) / 1000,
-      'seconds'
-    );
-    const idleSeconds = (Date.now() - lastCallTs) / 1000;
-    if (idleSeconds > MAX_IDLE_TIME_IN_SECONDS) {
-      console.log(`${SERVICE_NAME} has exitted`);
-      process.exit();
-    }
-  }, BEAT_STEP_IN_SECONDS * 1000);
+  const heartBeat = new HeartBeat(SERVICE_NAME, { explain: true });
+  heartBeat.init();
 }
 
 bootstrap();
