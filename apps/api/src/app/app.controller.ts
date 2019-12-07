@@ -1,5 +1,5 @@
 import { Message } from '@my-org/api-interfaces';
-import { Controller, Get, HttpService, Param } from '@nestjs/common';
+import { Controller, Get, HttpService, Param, Req } from '@nestjs/common';
 import { AxiosResponse } from 'axios';
 import { fork, ChildProcess } from 'child_process';
 import { Observable, Observer } from 'rxjs';
@@ -16,10 +16,11 @@ export class AppController {
 
   constructor(private readonly httpService: HttpService) {}
 
-  @Get(':serviceName')
-  getData(@Param() { serviceName }: { serviceName: string }): Observable<
-    AxiosResponse<Message>
-  > {
+  @Get(':serviceName/*')
+  getData(
+    @Req() req: Request,
+    @Param() { serviceName }: { serviceName: string }
+  ): Observable<AxiosResponse<Message>> {
     return this.getService(this.services, serviceName).pipe(
       tap((service: Service) => {
         if (!this.services[serviceName]) {
@@ -28,11 +29,10 @@ export class AppController {
       }),
       mergeMap((service: Service) => this.getServicePort(service)),
       tap((port: number) => (this.services[serviceName].port = port)),
-      mergeMap((port: number) =>
-        this.httpService
-          .get(`http://localhost:${port}/api`)
-          .pipe(map(res => res.data))
-      )
+      map((port: number) => this.getUrl('localhost', port, req.url)),
+      mergeMap((url: string) => {
+        return this.httpService.get(url).pipe(map(res => res.data));
+      })
     );
   }
 
@@ -75,5 +75,13 @@ export class AppController {
         observer.complete();
       });
     });
+  }
+
+  private getUrl(hostName: string, port: number, url: string, ssl = false) {
+    const urlAsArray = url.split('/');
+    urlAsArray.splice(0, 2);
+    const request = urlAsArray.join('/');
+    const protocol = ssl ? 'https' : 'http';
+    return `${protocol}://${hostName}:${port}/${request}`;
   }
 }

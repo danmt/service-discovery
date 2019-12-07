@@ -8,9 +8,6 @@ const BEAT_STEP_IN_SECONDS = 1;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const globalPrefix = 'api';
-
-  app.setGlobalPrefix(globalPrefix);
 
   let lastCallTs = Date.now();
   app.use((req, res, next) => {
@@ -22,9 +19,7 @@ async function bootstrap() {
   const server = await app.listen(0);
   process.send({ port: server.address().port });
   console.log(
-    `${SERVICE_NAME} running on http://localhost:${
-      server.address().port
-    }/${globalPrefix}`
+    `${SERVICE_NAME} running on http://localhost:${server.address().port}`
   );
 
   setInterval(() => {
