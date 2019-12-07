@@ -14,6 +14,7 @@ async function bootstrap() {
       '/' +
       globalPrefix
   );
+  setTimeout(() => process.exit(), 60 * 1000);
 }
 
 bootstrap();
