@@ -45,8 +45,6 @@ If you are wondering what I mean by _heart beat mechanism_, is simply a class th
 
 Once the service reaches the maximum time idle, the entire process is killed.
 
-Finally the heart beat has to be hooked into the service.
-
 ### How the API works
 
 Since our services run in the same server, from the API service we can start a new service instance. The API service has to keep track of the services location and status. Clients will perform requests to the API service and it will take care of redirecting and composing service consumption.
