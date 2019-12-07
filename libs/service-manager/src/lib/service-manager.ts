@@ -60,11 +60,8 @@ export const getUrl = (
   url: string,
   ssl = false
 ) => {
-  const urlAsArray = url.split('/');
-  urlAsArray.splice(0, 2);
-  const request = urlAsArray.join('/');
   const protocol = ssl ? 'https' : 'http';
-  return `${protocol}://${hostName}:${port}/${request}`;
+  return `${protocol}://${hostName}:${port}/${url}`;
 };
 
 export const getServiceUrl = (
@@ -77,4 +74,10 @@ export const getServiceUrl = (
     mergeMap((service: Service) => getServicePort(service, channel)),
     map((port: number) => getUrl('localhost', port, originalUrl))
   );
+};
+
+export const getOriginalUrl = (url: string) => {
+  const urlAsArray = url.split('/');
+  urlAsArray.splice(0, 2);
+  return urlAsArray.join('/');
 };

@@ -1,5 +1,9 @@
-import { Message } from '@my-org/api-interfaces';
-import { getServiceUrl, Service } from '@my-org/service-manager';
+import { ComposedMessage, Message } from '@my-org/api-interfaces';
+import {
+  getOriginalUrl,
+  getServiceUrl,
+  Service
+} from '@my-org/service-manager';
 import {
   Controller,
   Get,
@@ -11,7 +15,7 @@ import {
 } from '@nestjs/common';
 import { AxiosResponse } from 'axios';
 import { EventEmitter } from 'events';
-import { Observable, throwError } from 'rxjs';
+import { Observable, throwError, zip } from 'rxjs';
 import { catchError, map, mergeMap } from 'rxjs/operators';
 
 const AVAILABLE_SERVICES = ['service-a', 'service-b'];
@@ -36,6 +40,24 @@ export class AppController implements OnModuleInit {
     });
   }
 
+  @Get('composed')
+  getComposedData(): Observable<{
+    [serviceName: string]: AxiosResponse<ComposedMessage>;
+  }> {
+    return zip(
+      getServiceUrl(this.services, 'service-a', 'hello', this.channel).pipe(
+        mergeMap((url: string) =>
+          this.httpService.get(url).pipe(map(res => res.data.message))
+        )
+      ),
+      getServiceUrl(this.services, 'service-b', 'hello', this.channel).pipe(
+        mergeMap((url: string) =>
+          this.httpService.get(url).pipe(map(res => res.data.message))
+        )
+      )
+    ).pipe(map(([serviceAUrl, serviceBUrl]) => ({ serviceAUrl, serviceBUrl })));
+  }
+
   @Get(':serviceName/*')
   getData(
     @Req() req: Request,
@@ -48,7 +70,7 @@ export class AppController implements OnModuleInit {
     return getServiceUrl(
       this.services,
       serviceName,
-      req.url,
+      getOriginalUrl(req.url),
       this.channel
     ).pipe(
       mergeMap((url: string) =>
