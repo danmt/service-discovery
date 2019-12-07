@@ -154,7 +154,8 @@
         "serve": {
           "builder": "@nrwl/node:execute",
           "options": {
-            "buildTarget": "api:build"
+            "buildTarget": "api:build",
+            "port": 0
           }
         },
         "lint": {
@@ -197,6 +198,116 @@
           "options": {
             "jestConfig": "libs/api-interfaces/jest.config.js",
             "tsConfig": "libs/api-interfaces/tsconfig.spec.json"
+          }
+        }
+      }
+    },
+    "service-a": {
+      "root": "apps/service-a",
+      "sourceRoot": "apps/service-a/src",
+      "projectType": "application",
+      "prefix": "service-a",
+      "schematics": {},
+      "architect": {
+        "build": {
+          "builder": "@nrwl/node:build",
+          "options": {
+            "outputPath": "dist/apps/service-a",
+            "main": "apps/service-a/src/main.ts",
+            "tsConfig": "apps/service-a/tsconfig.app.json",
+            "assets": ["apps/service-a/src/assets"]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/service-a/src/environments/environment.ts",
+                  "with": "apps/service-a/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "service-a:build",
+            "port": 0
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "apps/service-a/tsconfig.app.json",
+              "apps/service-a/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!apps/service-a/**"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "apps/service-a/jest.config.js",
+            "tsConfig": "apps/service-a/tsconfig.spec.json"
+          }
+        }
+      }
+    },
+    "service-b": {
+      "root": "apps/service-b",
+      "sourceRoot": "apps/service-b/src",
+      "projectType": "application",
+      "prefix": "service-b",
+      "schematics": {},
+      "architect": {
+        "build": {
+          "builder": "@nrwl/node:build",
+          "options": {
+            "outputPath": "dist/apps/service-b",
+            "main": "apps/service-b/src/main.ts",
+            "tsConfig": "apps/service-b/tsconfig.app.json",
+            "assets": ["apps/service-b/src/assets"]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/service-b/src/environments/environment.ts",
+                  "with": "apps/service-b/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "service-b:build",
+            "port": 0
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "apps/service-b/tsconfig.app.json",
+              "apps/service-b/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!apps/service-b/**"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "apps/service-b/jest.config.js",
+            "tsConfig": "apps/service-b/tsconfig.spec.json"
           }
         }
       }

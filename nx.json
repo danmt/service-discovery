@@ -19,6 +19,12 @@
     },
     "api-interfaces": {
       "tags": []
+    },
+    "service-a": {
+      "tags": []
+    },
+    "service-b": {
+      "tags": []
     }
   }
 }
