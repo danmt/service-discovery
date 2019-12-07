@@ -12,7 +12,7 @@ interface Service {
 }
 @Controller()
 export class AppController {
-  services: { [key: string]: Service } = {};
+  services: { [serviceName: string]: Service } = {};
 
   constructor(private readonly httpService: HttpService) {}
 
@@ -20,7 +20,7 @@ export class AppController {
   getData(@Param() { serviceName }: { serviceName: string }): Observable<
     AxiosResponse<Message>
   > {
-    return this.getService(serviceName).pipe(
+    return this.getService(this.services, serviceName).pipe(
       tap((service: Service) => {
         if (!this.services[serviceName]) {
           this.services[serviceName] = service;
@@ -36,14 +36,26 @@ export class AppController {
     );
   }
 
-  private getService(serviceName: string) {
+  private getService(
+    services: { [serviceName: string]: Service },
+    serviceName: string
+  ) {
     return new Observable((observer: Observer<Service>) => {
+      if (services[serviceName]) {
+        observer.next(services[serviceName]);
+        observer.complete();
+        return;
+      }
+
       const service = {
         name: serviceName,
         instance: fork(`dist/apps/${serviceName}/main`)
       };
 
-      service.instance.on('exit', () => delete this.services[serviceName]);
+      service.instance.on('exit', () => {
+        console.log(`${serviceName} has been cleared from gateway`);
+        delete this.services[serviceName];
+      });
 
       observer.next(service);
       observer.complete();
